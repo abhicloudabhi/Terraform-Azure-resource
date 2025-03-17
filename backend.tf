@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    resource_group_name  = "deepak-rg"
+    resource_group_name  = "abhishek-rg"
     storage_account_name = "deepakstorage4572"
     container_name       = "terraformstorage"
     key                  = "./dev/terraform.tfstate"
