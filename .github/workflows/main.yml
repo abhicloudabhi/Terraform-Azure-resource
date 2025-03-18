@@ -3,36 +3,45 @@ name: Azure Infrastructure Deployment with Terraform
 on:
   push:
     branches:
-      - main  # Trigger this workflow on pushes to the main branch
+      - main  # Trigger on push to the main branch
   pull_request:
     branches:
       - main  # Trigger on pull requests targeting the main branch
 
 jobs:
   terraform:
-    runs-on: ubuntu-latest  # Runs on an Ubuntu virtual machine
+    runs-on: ubuntu-latest  # Running on an Ubuntu runner
 
     steps:
-      # Step 1: Checkout the repository to get the Terraform files
+      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Set up Terraform (this sets up the correct Terraform version)
+      # Step 2: Set up Terraform
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: '1.4.0'  # Set the required Terraform version
+          terraform_version: '1.4.0'  # Use the appropriate version of Terraform
 
-      # Step 3: Log in to Azure using Service Principal credentials
-      - name: Log in to Azure
+      # Step 3: Log in to Azure using Service Principal
+      - name: Log in to Azure using Service Principal
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}  # Azure credentials stored in GitHub secrets
+          creds: ${{ secrets.AZURE_CREDENTIALS }}  # Azure Service Principal stored as a secret in GitHub
 
-      # Step 4: Initialize Terraform (downloads provider plugins, etc.)
+      # Step 4: Set environment variables for Terraform authentication
+      - name: Set Terraform environment variables
+        run: |
+          # These environment variables are required for Terraform authentication
+          echo "ARM_CLIENT_ID=${{ secrets.AZURE_CREDENTIALS_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "ARM_CLIENT_SECRET=${{ secrets.AZURE_CREDENTIALS_CLIENT_SECRET }}" >> $GITHUB_ENV
+          echo "ARM_SUBSCRIPTION_ID=${{ secrets.AZURE_CREDENTIALS_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+          echo "ARM_TENANT_ID=${{ secrets.AZURE_CREDENTIALS_TENANT_ID }}" >> $GITHUB_ENV
+
+      # Step 5: Initialize Terraform
       - name: Terraform Init
         run: terraform init
 
-      # Step 5: Run Terraform Plan (to preview changes before applying)
+      # Step 6: Terraform Plan
       - name: Terraform Plan
         run: terraform plan
