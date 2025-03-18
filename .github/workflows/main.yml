@@ -3,7 +3,7 @@ name: 'Terraform Deployment'
 on:
   push:
     branches:
-      - main
+      - none
   workflow_dispatch:
 
 jobs:
@@ -27,12 +27,12 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: ./dev.tfvars
+        working-directory: ./
 
       - name: Terraform Plan
         run: terraform plan -var-file=./env/dev.tfvars
-        working-directory: ./dev.tfvars
+        working-directory: ./
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -var-file=./env/dev.tfvars
-        working-directory: ./dev.tfvars
+        working-directory: ./
